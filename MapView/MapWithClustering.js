@@ -26,6 +26,8 @@ export default class MapWithClustering extends Component {
     }
   };
 
+  currentRegion = this.state.currentRegion;
+
   componentDidMount() {
     this.createMarkersOnMap();
   }
@@ -41,6 +43,8 @@ export default class MapWithClustering extends Component {
   }
 
   onRegionChangeComplete = region => {
+    this.currentRegion = region;
+
     if (this.props.onRegionChangeComplete) {
       this.props.onRegionChangeComplete(region);
     }
@@ -150,7 +154,7 @@ export default class MapWithClustering extends Component {
   };
 
   calculateClustersForMap = async (
-    currentRegion = this.state.currentRegion
+    currentRegion = this.currentRegion
   ) => {
     let clusteredMarkers = [];
 
