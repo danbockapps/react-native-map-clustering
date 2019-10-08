@@ -7,7 +7,6 @@ import CustomMarker from "./CustomMarker";
 
 export default class MapWithClustering extends Component {
   state = {
-    currentRegion: this.props.region,
     currentChildren: this.props.children,
     clusterStyle: {
       borderRadius: w(15),
@@ -26,8 +25,6 @@ export default class MapWithClustering extends Component {
     }
   };
 
-  currentRegion = this.state.currentRegion;
-
   componentDidMount() {
     this.createMarkersOnMap();
   }
@@ -43,20 +40,16 @@ export default class MapWithClustering extends Component {
   }
 
   onRegionChangeComplete = region => {
-    this.currentRegion = region;
-
     if (this.props.onRegionChangeComplete) {
       this.props.onRegionChangeComplete(region);
     }
-
-    if (!this.state.currentRegion) return;
 
     const {
       latitude,
       latitudeDelta,
       longitude,
       longitudeDelta
-    } = this.state.currentRegion;
+    } = this.props.region;
 
     if (region.longitudeDelta <= 80) {
       if (
@@ -153,13 +146,11 @@ export default class MapWithClustering extends Component {
     return Math.min(latZoom, lngZoom, ZOOM_MAX);
   };
 
-  calculateClustersForMap = async (
-    currentRegion = this.currentRegion
-  ) => {
+  calculateClustersForMap = async () => {
     let clusteredMarkers = [];
 
     if (this.props.clustering && this.superCluster) {
-      const bBox = this.calculateBBox(this.state.currentRegion);
+      const bBox = this.calculateBBox(this.props.region);
       let zoom = this.getBoundsZoomLevel(bBox, {
         height: h(100),
         width: w(100)
@@ -199,10 +190,7 @@ export default class MapWithClustering extends Component {
       clusteredMarkers = this.state.markers.map(marker => marker.marker);
     }
 
-    this.setState({
-      clusteredMarkers,
-      currentRegion
-    });
+    this.setState({clusteredMarkers});
   };
 
   removeChildrenFromProps = props => {
@@ -222,7 +210,7 @@ export default class MapWithClustering extends Component {
         ref={ref => {
           this.root = ref;
         }}
-        region={this.state.currentRegion}
+        region={this.props.region}
         onRegionChangeComplete={this.onRegionChangeComplete}
       >
         {this.state.clusteredMarkers}
